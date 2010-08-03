@@ -127,7 +127,7 @@ object AvonUtil {
       val startTime = System.currentTimeMillis
       val response: HttpResponse = client.execute(host, loginPost)
       val totalTime = System.currentTimeMillis - startTime
-      System.out.println("response:code "+ response.getStatusLine.getStatusCode+ "time: "+ totalTime)
+      System.out.println("response:code "+ response.getStatusLine.getStatusCode+ " time: "+ totalTime)
       response
   }
 

@@ -7,6 +7,7 @@
     <inceptionYear>2008</inceptionYear>
     <properties>
         <scala.version>2.7.7</scala.version>
+        <test.host>www.avonconnects.co.uk</test.host>
     </properties>
 
     <repositories>
@@ -136,6 +137,12 @@
                                 <configuration>
                                     <mainClass>com.syncapse.avon.App</mainClass>
                                     <includeProjectDependencies>true</includeProjectDependencies>
+                                    <systemProperties>
+                                        <systemProperty>
+                                            <key>test.host</key>
+                                            <value>${test.host}</value>
+                                        </systemProperty>
+                                    </systemProperties>
                                 </configuration>
                             </execution>
                         </executions>
