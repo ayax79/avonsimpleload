@@ -117,10 +117,12 @@ object UserInfo {
 object AvonUtil {
 
   lazy val host = System.getProperty("test.host", "www.avonconnects.co.uk")
+  lazy val port = System.getProperty("test.port", "80").toInt
+  lazy val prefix = System.getProperty("test.prefix", "")
 
-  def makeLoginRequest(client: HttpClient, host: HttpHost, info: (UserInfo, String)) = info match {
+  def makeLoginRequest(client: HttpClient, host: HttpHost, info: Any) = info match {
     case (_, xml: String) =>
-      val loginPost: HttpPost = new HttpPost("/login.jspa")
+      val loginPost: HttpPost = new HttpPost(prefix + "/login.jspa")
       val params : java.util.List[NameValuePair] = new ArrayList
       params.add(new BasicNameValuePair("SAMLResponse", base64encode(xml)))
       loginPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"))
@@ -133,7 +135,8 @@ object AvonUtil {
 
   def fullLogin = {
     val client = new DefaultHttpClient
-    makeLoginRequest(client, new HttpHost(host), UserInfo.randomWithSaml)
+    val saml: Any = UserInfo.randomWithSaml
+    makeLoginRequest(client, new HttpHost(host, port), saml)
   }
 
 
@@ -219,15 +222,11 @@ object AvonUtil {
           <saml:AttributeStatement>
             <saml:Attribute Name="Username">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">
-                {username}
-              </saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{username}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="Email">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">
-                {email}
-              </saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{email}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="FirstName">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -239,9 +238,7 @@ object AvonUtil {
             </saml:Attribute>
             <saml:Attribute Name="UserType">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">
-                {userType.name}
-              </saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{userType.name}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="AccountId">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -376,7 +373,9 @@ object AvonUtil {
           </Signature>
         </saml:Assertion>
       </samlp:Response>;
+      xml
     }
-    samlResponseString(id, ui.username, ui.email, ui.userType).toString
+    val content = samlResponseString(id, ui.username, ui.email, ui.userType)
+    content.toString
   }
 }

@@ -7,12 +7,17 @@ import org.slf4j.LoggerFactory
  *
  */
 object App extends Application {
-  for (i <- 0 until 50) {
+  lazy val threads = System.getProperty("test.threads", "50").toInt
+  lazy val sleep = System.getProperty("test.sleep", "500").toInt
+
+  System.out.println("host: " + AvonUtil.host + " port: " + AvonUtil.port + " prefix:" + AvonUtil.prefix)
+
+  for (i <- 0 until threads) {
     new Thread(new Runnable() {
       def run = {
-        while(true) {
+        while (true) {
           AvonUtil.fullLogin
-          Thread.sleep(500)
+          Thread.sleep(sleep)
         }
       }
     }).start

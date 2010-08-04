@@ -8,6 +8,10 @@
     <properties>
         <scala.version>2.7.7</scala.version>
         <test.host>www.avonconnects.co.uk</test.host>
+        <test.port>80</test.port>
+        <test.prefix></test.prefix>
+        <test.threads>50</test.threads>
+        <test.sleep>500</test.sleep>
     </properties>
 
     <repositories>
@@ -59,7 +63,7 @@
             <artifactId>xmltooling</artifactId>
             <version>1.2.1</version>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>com.jivesoftware</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.4.3-3.0.0</version>
@@ -120,6 +124,14 @@
     </reporting>
     <profiles>
         <profile>
+            <id>local</id>
+            <properties>
+                <test.host>localhost</test.host>
+                <test.port>8080</test.port>
+                <test.prefix>/jive</test.prefix>
+            </properties>
+        </profile>
+        <profile>
             <id>run</id>
             <build>
                 <plugins>
@@ -141,6 +153,18 @@
                                         <systemProperty>
                                             <key>test.host</key>
                                             <value>${test.host}</value>
+                                        </systemProperty>
+                                        <systemProperty>
+                                            <key>test.port</key>
+                                            <value>${test.port}</value>
+                                        </systemProperty>
+                                        <systemProperty>
+                                            <key>test.prefix</key>
+                                            <value>${test.prefix}</value>
+                                        </systemProperty>
+                                        <systemProperty>
+                                            <key>test.threads</key>
+                                            <value>${test.threads}</value>
                                         </systemProperty>
                                     </systemProperties>
                                 </configuration>
