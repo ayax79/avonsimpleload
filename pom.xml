@@ -12,6 +12,7 @@
         <test.prefix></test.prefix>
         <test.threads>50</test.threads>
         <test.sleep>500</test.sleep>
+        <test.class>com.syncapse.avon.LoginApp</test.class>
     </properties>
 
     <repositories>
@@ -129,6 +130,14 @@
                 <test.host>localhost</test.host>
                 <test.port>8080</test.port>
                 <test.prefix>/jive</test.prefix>
+                <test.threads>8</test.threads>
+                <test.sleep>2000</test.sleep>
+            </properties>
+        </profile>
+        <profile>
+            <id>mygroups</id>
+            <properties>
+                <test.class>com.syncapse.avon.MyGroupsApp</test.class>
             </properties>
         </profile>
         <profile>
@@ -147,7 +156,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>com.syncapse.avon.App</mainClass>
+                                    <mainClass>${test.class}</mainClass>
                                     <includeProjectDependencies>true</includeProjectDependencies>
                                     <systemProperties>
                                         <systemProperty>
@@ -165,6 +174,10 @@
                                         <systemProperty>
                                             <key>test.threads</key>
                                             <value>${test.threads}</value>
+                                        </systemProperty>
+                                        <systemProperty>
+                                            <key>test.sleep</key>
+                                            <value>${test.sleep}</value>
                                         </systemProperty>
                                     </systemProperties>
                                 </configuration>

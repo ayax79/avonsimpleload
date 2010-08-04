@@ -2,7 +2,6 @@ package com.syncapse.avon
 
 import org.opensaml.xml.util.Base64
 import xml.Elem
-import org.apache.http.client.methods.HttpPost
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.entity.BufferedHttpEntity
@@ -12,6 +11,10 @@ import org.apache.http.{NameValuePair, HttpResponse, HttpHost}
 import java.util.ArrayList
 import org.slf4j.LoggerFactory
 import org.apache.http.util._
+import org.apache.http.client.methods.{HttpGet, HttpPost}
+import org.apache.http.conn.scheme.{PlainSocketFactory, Scheme, SchemeRegistry}
+import org.apache.http.auth.{UsernamePasswordCredentials, AuthScope}
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
 
 object UserTypes {
   lazy private val random = new Random
@@ -49,21 +52,36 @@ object AvonUtil {
   lazy val prefix = System.getProperty("test.prefix", "")
   lazy val httpHost = new HttpHost(host, port)
 
-  def makeLoginRequest(client: HttpClient, host: HttpHost, info: Any) = info match {
+  def makeLoginRequest(client: HttpClient, info: Any) = info match {
     case (_, xml: String) =>
       val loginPost: HttpPost = new HttpPost(prefix + "/login.jspa")
       val params : java.util.List[NameValuePair] = new ArrayList
       params.add(new BasicNameValuePair("SAMLResponse", base64encode(xml)))
       loginPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"))
       val startTime = System.currentTimeMillis
-      val response: HttpResponse = client.execute(host, loginPost)
+      val response: HttpResponse = client.execute(httpHost, loginPost)
       val totalTime = System.currentTimeMillis - startTime
-      System.out.println("response:code "+ response.getStatusLine.getStatusCode+ " time: "+ totalTime)
+      System.out.println("makeLoginRequest: response code: "+ response.getStatusLine.getStatusCode+ " time: "+ totalTime)
       response
+  }
+
+  def makeGetGroupsRequest(client: HttpClient, ui: UserInfo) = {
+    val groupsGet = new HttpGet(prefix + "/people/"+ui.username+"?view=groups")
+    val startTime = System.currentTimeMillis
+    val response = client.execute(httpHost, groupsGet)
+    val totalTime = System.currentTimeMillis - startTime
+    System.out.println("makeGetGroupsRequest: response code: "+ response.getStatusLine.getStatusCode + " time: " + totalTime)
+    response
   }
 
   def base64encode(xml: String) = {
     Base64.encodeBytes(xml.getBytes("utf-8"), Base64.DONT_BREAK_LINES)
+  }
+
+  def httpClient: HttpClient = {
+    val schemeRegistry = new SchemeRegistry();
+    schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), port));
+    new DefaultHttpClient(new ThreadSafeClientConnManager(schemeRegistry))
   }
 
   def samlResponseString(ui: UserInfo): String =  {
