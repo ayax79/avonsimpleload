@@ -38,80 +38,8 @@ trait UserInfo {
   def email: String
 
   def userType: UserType
-}
 
-object UserInfo {
-  lazy private val random = new Random();
-
-  case object Test0 extends UserInfo {
-    val username = "test0"
-    val email = "test0@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test1 extends UserInfo {
-    val username = "test1"
-    val email = "test1@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test2 extends UserInfo {
-    val username = "test2"
-    val email = "test2@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test3 extends UserInfo {
-    val username = "test3"
-    val email = "test3@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test4 extends UserInfo {
-    val username = "test4"
-    val email = "test4@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test5 extends UserInfo {
-    val username = "test5"
-    val email = "test0@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test6 extends UserInfo {
-    val username = "test6"
-    val email = "test6@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test7 extends UserInfo {
-    val username = "test7"
-    val email = "test7@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test8 extends UserInfo {
-    val username = "test8"
-    val email = "test8@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  case object Test9 extends UserInfo {
-    val username = "test9"
-    val email = "test9@mailinator.com"
-    val userType = UserTypes.randomUserType
-  }
-
-  val users : List[UserInfo] = Test0 :: Test1 :: Test2 :: Test3 :: Test4 :: Test5 :: Test6 :: Test7 :: Test8 :: Test9 :: Nil
-
-  def randomUserInfo: UserInfo = users.apply(random.nextInt(users.length))
-
-  def randomWithSaml: (UserInfo, String) = {
-    val info = randomUserInfo
-    (info, AvonUtil.samlResponseString(info))
-  }
-
+  def accountId: Long
 }
 
 object AvonUtil {
@@ -134,13 +62,6 @@ object AvonUtil {
       response
   }
 
-  def fullLogin = {
-    val client = new DefaultHttpClient
-    val saml: Any = UserInfo.randomWithSaml
-    makeLoginRequest(client, httpHost, saml)
-  }
-
-
   def base64encode(xml: String) = {
     Base64.encodeBytes(xml.getBytes("utf-8"), Base64.DONT_BREAK_LINES)
   }
@@ -148,7 +69,7 @@ object AvonUtil {
   def samlResponseString(ui: UserInfo): String =  {
     val id = "testCase-" + System.currentTimeMillis
 
-    def samlResponseString(id: String, username: String, email: String, userType: UserType) = {
+    def samlResponseStringXml(id: String, ui: UserInfo) = {
       val xml = <samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
                                 Destination="http://http://avon-uk2.hosted.jivesoftware.com/login.jspa" ID={id} InResponseTo="_f8beaf3fec8467b2215ea2ea62cb0e7b" IssueInstant="2010-07-02T17:19:48Z" Version="2.0">
         <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
@@ -223,27 +144,27 @@ object AvonUtil {
           <saml:AttributeStatement>
             <saml:Attribute Name="Username">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{username}</saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{ui.username}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="Email">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{email}</saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{ui.email}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="FirstName">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">NNCOLAE GGBRIEL</saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{ui.username}First</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="LastName">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">SSNDU</saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{ui.username}Last</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="UserType">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{userType.name}</saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{ui.userType.name}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="AccountId">
               <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">4259585</saml:AttributeValue>
+                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">{ui.accountId}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute Name="CustomerId">
                 <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -376,7 +297,7 @@ object AvonUtil {
       </samlp:Response>;
       xml
     }
-    val content = samlResponseString(id, ui.username, ui.email, ui.userType)
+    val content = samlResponseStringXml(id, ui)
     content.toString
   }
 }

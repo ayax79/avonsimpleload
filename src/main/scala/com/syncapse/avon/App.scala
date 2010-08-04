@@ -17,9 +17,10 @@ object App extends Application {
     new Thread(new Runnable() {
       def run = {
         val userInfo = new UserInfo {
-          val username = "test" + i
-          val email = "test" + i + "@mailinator.com"
+          val username = "avontest" + i
+          val email = "avontest" + i + "@mailinator.com"
           val userType = UserTypes.randomUserType
+          val accountId = (Integer.MAX_VALUE - i).toLong
         }
 
         while (true) {
