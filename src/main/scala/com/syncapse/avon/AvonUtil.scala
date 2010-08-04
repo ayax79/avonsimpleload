@@ -32,7 +32,7 @@ object UserTypes {
 sealed trait UserType {def name: String}
 
 
-sealed trait UserInfo {
+trait UserInfo {
   def username: String
 
   def email: String
@@ -119,6 +119,7 @@ object AvonUtil {
   lazy val host = System.getProperty("test.host", "www.avonconnects.co.uk")
   lazy val port = System.getProperty("test.port", "80").toInt
   lazy val prefix = System.getProperty("test.prefix", "")
+  lazy val httpHost = new HttpHost(host, port)
 
   def makeLoginRequest(client: HttpClient, host: HttpHost, info: Any) = info match {
     case (_, xml: String) =>
@@ -136,7 +137,7 @@ object AvonUtil {
   def fullLogin = {
     val client = new DefaultHttpClient
     val saml: Any = UserInfo.randomWithSaml
-    makeLoginRequest(client, new HttpHost(host, port), saml)
+    makeLoginRequest(client, httpHost, saml)
   }
 
 
