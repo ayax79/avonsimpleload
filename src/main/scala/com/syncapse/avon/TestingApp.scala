@@ -5,6 +5,7 @@ trait TestingApp {
   lazy val sleep = System.getProperty("test.sleep", "500").toInt
 
   def performTest[T](f: UserInfo => T): Unit = {
+    System.out.println("Running test app " + getClass.getSimpleName)
     System.out.println("host: " + AvonUtil.host + " port: " + AvonUtil.port + " prefix:" + AvonUtil.prefix)
 
     for (i <- 0 until threads) {
@@ -18,7 +19,13 @@ trait TestingApp {
       new Thread(new Runnable() {
         def run = {
           while (true) {
-            f(userInfo)
+            try {
+              f(userInfo)
+            } catch {
+              case e: Exception =>
+                System.err.println(e.getMessage)
+                e.printStackTrace
+            }
             Thread.sleep(sleep)
           }
         }

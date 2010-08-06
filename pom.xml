@@ -12,7 +12,7 @@
         <test.prefix></test.prefix>
         <test.threads>50</test.threads>
         <test.sleep>500</test.sleep>
-        <test.class>com.syncapse.avon.LoginApp</test.class>
+        <test.class>com.syncapse.avon.DummyApp</test.class>
     </properties>
 
     <repositories>
@@ -138,6 +138,18 @@
             <id>mygroups</id>
             <properties>
                 <test.class>com.syncapse.avon.MyGroupsApp</test.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>communities</id>
+            <properties>
+                <test.class>com.syncapse.avon.CommunityApp</test.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>login</id>
+            <properties>
+                <test.class>com.syncapse.avon.LoginApp</test.class>
             </properties>
         </profile>
         <profile>

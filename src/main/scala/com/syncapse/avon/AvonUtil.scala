@@ -58,20 +58,31 @@ object AvonUtil {
       val params : java.util.List[NameValuePair] = new ArrayList
       params.add(new BasicNameValuePair("SAMLResponse", base64encode(xml)))
       loginPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"))
-      val startTime = System.currentTimeMillis
-      val response: HttpResponse = client.execute(httpHost, loginPost)
-      val totalTime = System.currentTimeMillis - startTime
-      System.out.println("makeLoginRequest: response code: "+ response.getStatusLine.getStatusCode+ " time: "+ totalTime)
-      response
+      Benchmark.measure("login") {
+        val response: HttpResponse = client.execute(httpHost, loginPost)
+        response.getEntity.consumeContent
+        response.getStatusLine.getStatusCode
+      }
   }
 
   def makeGetGroupsRequest(client: HttpClient, ui: UserInfo) = {
     val groupsGet = new HttpGet(prefix + "/people/"+ui.username+"?view=groups")
-    val startTime = System.currentTimeMillis
-    val response = client.execute(httpHost, groupsGet)
-    val totalTime = System.currentTimeMillis - startTime
-    System.out.println("makeGetGroupsRequest: response code: "+ response.getStatusLine.getStatusCode + " time: " + totalTime)
-    response
+    Benchmark.measure("groups") {
+      val response = client.execute(httpHost, groupsGet)
+      response.getEntity.consumeContent
+      response.getStatusLine.getStatusCode
+    }
+  }
+
+  def makeGetCommunitiesRequest(client: HttpClient) = {
+    val url: String = prefix + "/index.jspa"
+    val communityGet = new HttpGet(url)
+
+    Benchmark.measure("communities") {
+      val response = client.execute(httpHost, communityGet)
+      response.getEntity.consumeContent
+      response.getStatusLine.getStatusCode
+    }
   }
 
   def base64encode(xml: String) = {
